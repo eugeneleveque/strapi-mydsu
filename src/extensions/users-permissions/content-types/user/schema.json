@@ -100,11 +100,11 @@
       "target": "api::booking.booking",
       "inversedBy": "user"
     },
-    "like": {
+    "like_user": {
       "type": "relation",
-      "relation": "manyToOne",
+      "relation": "oneToMany",
       "target": "api::like.like",
-      "inversedBy": "fromUser"
+      "mappedBy": "fromUser"
     },
     "likes": {
       "type": "relation",
@@ -112,11 +112,23 @@
       "target": "api::like.like",
       "mappedBy": "toUser"
     },
-    "match": {
+    "matches": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::match.match",
+      "mappedBy": "user1"
+    },
+    "profile": {
       "type": "relation",
       "relation": "oneToOne",
+      "target": "api::profile.profile",
+      "inversedBy": "User"
+    },
+    "matches2": {
+      "type": "relation",
+      "relation": "oneToMany",
       "target": "api::match.match",
-      "inversedBy": "users"
+      "mappedBy": "user2"
     }
   }
 }

@@ -617,7 +617,7 @@ export interface ApiLikeLike extends Struct.CollectionTypeSchema {
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     fromUser: Schema.Attribute.Relation<
-      'oneToMany',
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -657,8 +657,12 @@ export interface ApiMatchMatch extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    users: Schema.Attribute.Relation<
-      'oneToOne',
+    user1: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    user2: Schema.Attribute.Relation<
+      'manyToOne',
       'plugin::users-permissions.user'
     >;
   };
@@ -675,19 +679,31 @@ export interface ApiProfileProfile extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    age: Schema.Attribute.Integer;
+    bio: Schema.Attribute.Blocks;
+    city: Schema.Attribute.String;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    interests: Schema.Attribute.Blocks;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
       'api::profile.profile'
     > &
       Schema.Attribute.Private;
+    photos: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
     publishedAt: Schema.Attribute.DateTime;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    User: Schema.Attribute.Relation<
+      'oneToOne',
+      'plugin::users-permissions.user'
+    >;
   };
 }
 
@@ -1169,7 +1185,7 @@ export interface PluginUsersPermissionsUser
         minLength: 6;
       }>;
     interests: Schema.Attribute.JSON;
-    like: Schema.Attribute.Relation<'manyToOne', 'api::like.like'>;
+    like_user: Schema.Attribute.Relation<'oneToMany', 'api::like.like'>;
     likes: Schema.Attribute.Relation<'oneToMany', 'api::like.like'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -1177,12 +1193,14 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
-    match: Schema.Attribute.Relation<'oneToOne', 'api::match.match'>;
+    matches: Schema.Attribute.Relation<'oneToMany', 'api::match.match'>;
+    matches2: Schema.Attribute.Relation<'oneToMany', 'api::match.match'>;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    profile: Schema.Attribute.Relation<'oneToOne', 'api::profile.profile'>;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;

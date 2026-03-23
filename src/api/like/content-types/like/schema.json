@@ -13,9 +13,9 @@
   "attributes": {
     "fromUser": {
       "type": "relation",
-      "relation": "oneToMany",
+      "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
-      "mappedBy": "like"
+      "inversedBy": "like_user"
     },
     "toUser": {
       "type": "relation",

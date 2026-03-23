@@ -11,11 +11,17 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "users": {
+    "user1": {
       "type": "relation",
-      "relation": "oneToOne",
+      "relation": "manyToOne",
       "target": "plugin::users-permissions.user",
-      "mappedBy": "match"
+      "inversedBy": "matches"
+    },
+    "user2": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "matches2"
     },
     "createdat": {
       "type": "datetime"
