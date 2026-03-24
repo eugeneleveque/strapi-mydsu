@@ -1,0 +1,14 @@
+node_modules/
+build/
+.cache/
+.tmp/
+.git/
+.env
+data/
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+docker-compose.yml
+Dockerfile
+.dockerignore
