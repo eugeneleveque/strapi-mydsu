@@ -1,0 +1,14 @@
+services:
+  strapi:
+    container_name: strapi
+    build: .
+    image: strapi-mydsu:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./.tmp:/opt/app/.tmp
+      - ./public/uploads:/opt/app/public/uploads
+    ports:
+      - "1337:1337"
