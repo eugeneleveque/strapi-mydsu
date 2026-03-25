@@ -22,7 +22,7 @@
       "relation": "oneToOne",
       "target": "api::activity.activity"
     },
-    "statu": {
+    "state": {
       "type": "enumeration",
       "enum": [
         "pending",

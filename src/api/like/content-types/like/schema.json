@@ -23,7 +23,7 @@
       "target": "plugin::users-permissions.user",
       "inversedBy": "likes"
     },
-    "statu": {
+    "state": {
       "type": "enumeration",
       "enum": [
         "pending",

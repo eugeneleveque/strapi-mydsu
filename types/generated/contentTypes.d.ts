@@ -107,43 +107,6 @@ export interface AdminApiTokenPermission extends Struct.CollectionTypeSchema {
   };
 }
 
-export interface AdminAuditLog extends Struct.CollectionTypeSchema {
-  collectionName: 'strapi_audit_logs';
-  info: {
-    displayName: 'Audit Log';
-    pluralName: 'audit-logs';
-    singularName: 'audit-log';
-  };
-  options: {
-    draftAndPublish: false;
-    timestamps: false;
-  };
-  pluginOptions: {
-    'content-manager': {
-      visible: false;
-    };
-    'content-type-builder': {
-      visible: false;
-    };
-  };
-  attributes: {
-    action: Schema.Attribute.String & Schema.Attribute.Required;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    date: Schema.Attribute.DateTime & Schema.Attribute.Required;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<'oneToMany', 'admin::audit-log'> &
-      Schema.Attribute.Private;
-    payload: Schema.Attribute.JSON;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    user: Schema.Attribute.Relation<'oneToOne', 'admin::user'>;
-  };
-}
-
 export interface AdminPermission extends Struct.CollectionTypeSchema {
   collectionName: 'admin_permissions';
   info: {
@@ -559,7 +522,7 @@ export interface ApiBookingBooking extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
-    statu: Schema.Attribute.Enumeration<['pending', 'confirmed', 'cancelled']>;
+    state: Schema.Attribute.Enumeration<['pending', 'confirmed', 'cancelled']>;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -624,7 +587,7 @@ export interface ApiLikeLike extends Struct.CollectionTypeSchema {
     localizations: Schema.Attribute.Relation<'oneToMany', 'api::like.like'> &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
-    statu: Schema.Attribute.Enumeration<['pending', 'accepted']>;
+    state: Schema.Attribute.Enumeration<['pending', 'accepted']>;
     toUser: Schema.Attribute.Relation<
       'manyToOne',
       'plugin::users-permissions.user'
@@ -663,45 +626,6 @@ export interface ApiMatchMatch extends Struct.CollectionTypeSchema {
     >;
     user2: Schema.Attribute.Relation<
       'manyToOne',
-      'plugin::users-permissions.user'
-    >;
-  };
-}
-
-export interface ApiProfileProfile extends Struct.CollectionTypeSchema {
-  collectionName: 'profiles';
-  info: {
-    displayName: 'Profile';
-    pluralName: 'profiles';
-    singularName: 'profile';
-  };
-  options: {
-    draftAndPublish: true;
-  };
-  attributes: {
-    age: Schema.Attribute.Integer;
-    bio: Schema.Attribute.Blocks;
-    city: Schema.Attribute.String;
-    createdAt: Schema.Attribute.DateTime;
-    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    interests: Schema.Attribute.Blocks;
-    locale: Schema.Attribute.String & Schema.Attribute.Private;
-    localizations: Schema.Attribute.Relation<
-      'oneToMany',
-      'api::profile.profile'
-    > &
-      Schema.Attribute.Private;
-    photos: Schema.Attribute.Media<
-      'images' | 'files' | 'videos' | 'audios',
-      true
-    >;
-    publishedAt: Schema.Attribute.DateTime;
-    updatedAt: Schema.Attribute.DateTime;
-    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
-      Schema.Attribute.Private;
-    User: Schema.Attribute.Relation<
-      'oneToOne',
       'plugin::users-permissions.user'
     >;
   };
@@ -1200,7 +1124,6 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
-    profile: Schema.Attribute.Relation<'oneToOne', 'api::profile.profile'>;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     resetPasswordToken: Schema.Attribute.String & Schema.Attribute.Private;
@@ -1229,7 +1152,6 @@ declare module '@strapi/strapi' {
     export interface ContentTypeSchemas {
       'admin::api-token': AdminApiToken;
       'admin::api-token-permission': AdminApiTokenPermission;
-      'admin::audit-log': AdminAuditLog;
       'admin::permission': AdminPermission;
       'admin::role': AdminRole;
       'admin::session': AdminSession;
@@ -1242,7 +1164,6 @@ declare module '@strapi/strapi' {
       'api::global.global': ApiGlobalGlobal;
       'api::like.like': ApiLikeLike;
       'api::match.match': ApiMatchMatch;
-      'api::profile.profile': ApiProfileProfile;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

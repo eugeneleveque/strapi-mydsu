@@ -118,12 +118,6 @@
       "target": "api::match.match",
       "mappedBy": "user1"
     },
-    "profile": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::profile.profile",
-      "inversedBy": "User"
-    },
     "matches2": {
       "type": "relation",
       "relation": "oneToMany",
