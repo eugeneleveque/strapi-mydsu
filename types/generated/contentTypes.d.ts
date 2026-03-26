@@ -1108,6 +1108,7 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    gender: Schema.Attribute.String;
     interests: Schema.Attribute.JSON;
     like_user: Schema.Attribute.Relation<'oneToMany', 'api::like.like'>;
     likes: Schema.Attribute.Relation<'oneToMany', 'api::like.like'>;

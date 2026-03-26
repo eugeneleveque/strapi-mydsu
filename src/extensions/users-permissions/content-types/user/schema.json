@@ -123,6 +123,9 @@
       "relation": "oneToMany",
       "target": "api::match.match",
       "mappedBy": "user2"
+    },
+    "gender": {
+      "type": "string"
     }
   }
 }
