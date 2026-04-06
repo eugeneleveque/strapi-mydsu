@@ -22,6 +22,18 @@
       "relation": "oneToOne",
       "target": "api::activity.activity"
     },
+    "organizer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "organizedBookings"
+    },
+    "participants": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "plugin::users-permissions.user",
+      "inversedBy": "participatedBookings"
+    },
     "state": {
       "type": "enumeration",
       "enum": [

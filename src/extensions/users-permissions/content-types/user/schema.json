@@ -88,11 +88,17 @@
         "audios"
       ]
     },
-    "activities": {
+    "organizedBookings": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::booking.booking",
+      "mappedBy": "organizer"
+    },
+    "participatedBookings": {
       "type": "relation",
       "relation": "manyToMany",
-      "target": "api::activity.activity",
-      "inversedBy": "participants"
+      "target": "api::booking.booking",
+      "mappedBy": "participants"
     },
     "booking": {
       "type": "relation",

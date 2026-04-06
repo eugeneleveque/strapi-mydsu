@@ -475,6 +475,7 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     date: Schema.Attribute.Date;
     description: Schema.Attribute.RichText;
+    image: Schema.Attribute.Media<'images'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -483,14 +484,7 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     location: Schema.Attribute.String;
     maxParticipants: Schema.Attribute.Integer;
-    organizer: Schema.Attribute.Relation<
-      'oneToMany',
-      'plugin::users-permissions.user'
-    >;
-    participants: Schema.Attribute.Relation<
-      'manyToMany',
-      'plugin::users-permissions.user'
-    >;
+    price: Schema.Attribute.Decimal;
     publishedAt: Schema.Attribute.DateTime;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
@@ -521,6 +515,14 @@ export interface ApiBookingBooking extends Struct.CollectionTypeSchema {
       'api::booking.booking'
     > &
       Schema.Attribute.Private;
+    organizer: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    participants: Schema.Attribute.Relation<
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
     publishedAt: Schema.Attribute.DateTime;
     state: Schema.Attribute.Enumeration<['pending', 'confirmed', 'cancelled']>;
     updatedAt: Schema.Attribute.DateTime;
@@ -1089,10 +1091,6 @@ export interface PluginUsersPermissionsUser
     draftAndPublish: false;
   };
   attributes: {
-    activities: Schema.Attribute.Relation<
-      'manyToMany',
-      'api::activity.activity'
-    >;
     age: Schema.Attribute.Date;
     bio: Schema.Attribute.String;
     blocked: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
@@ -1120,6 +1118,14 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.Private;
     matches: Schema.Attribute.Relation<'oneToMany', 'api::match.match'>;
     matches2: Schema.Attribute.Relation<'oneToMany', 'api::match.match'>;
+    organizedBookings: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::booking.booking'
+    >;
+    participatedBookings: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::booking.booking'
+    >;
     password: Schema.Attribute.Password &
       Schema.Attribute.Private &
       Schema.Attribute.SetMinMaxLength<{

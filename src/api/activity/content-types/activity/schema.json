@@ -26,16 +26,16 @@
     "maxParticipants": {
       "type": "integer"
     },
-    "organizer": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "plugin::users-permissions.user"
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
     },
-    "participants": {
-      "type": "relation",
-      "relation": "manyToMany",
-      "target": "plugin::users-permissions.user",
-      "mappedBy": "activities"
+    "price": {
+      "type": "decimal"
     }
   }
 }
