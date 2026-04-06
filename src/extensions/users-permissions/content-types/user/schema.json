@@ -132,6 +132,18 @@
     },
     "gender": {
       "type": "string"
+    },
+    "sentMessages": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::message.message",
+      "mappedBy": "sender"
+    },
+    "receivedMessages": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::message.message",
+      "mappedBy": "recipient"
     }
   }
 }
