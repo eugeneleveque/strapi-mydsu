@@ -48,6 +48,9 @@
     "date": {
       "type": "date"
     },
+    "activityName": {
+      "type": "string"
+    },
     "createdat": {
       "type": "datetime",
       "conditions": {

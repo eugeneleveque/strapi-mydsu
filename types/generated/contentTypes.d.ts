@@ -505,6 +505,7 @@ export interface ApiBookingBooking extends Struct.CollectionTypeSchema {
   };
   attributes: {
     activity: Schema.Attribute.Relation<'oneToOne', 'api::activity.activity'>;
+    activityName: Schema.Attribute.String;
     createdat: Schema.Attribute.DateTime;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
