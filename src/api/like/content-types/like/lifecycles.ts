@@ -44,12 +44,12 @@ export default {
 
     await strapi.db.query('api::like.like').update({
       where: { id: like.id },
-      data: { statu: 'accepted' },
+      data: { state: 'accepted' },
     });
 
     await strapi.db.query('api::like.like').update({
       where: { id: reverseLike.id },
-      data: { statu: 'accepted' },
+      data: { state: 'accepted' },
     });
   },
 };
