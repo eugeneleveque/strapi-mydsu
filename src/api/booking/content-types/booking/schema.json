@@ -45,6 +45,9 @@
     "time": {
       "type": "time"
     },
+    "date": {
+      "type": "date"
+    },
     "createdat": {
       "type": "datetime",
       "conditions": {
