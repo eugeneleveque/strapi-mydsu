@@ -42,6 +42,9 @@
         "cancelled"
       ]
     },
+    "time": {
+      "type": "time"
+    },
     "createdat": {
       "type": "datetime",
       "conditions": {

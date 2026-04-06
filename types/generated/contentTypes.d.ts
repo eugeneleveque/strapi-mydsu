@@ -525,6 +525,7 @@ export interface ApiBookingBooking extends Struct.CollectionTypeSchema {
     >;
     publishedAt: Schema.Attribute.DateTime;
     state: Schema.Attribute.Enumeration<['pending', 'confirmed', 'cancelled']>;
+    time: Schema.Attribute.Time;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
