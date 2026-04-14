@@ -13,7 +13,9 @@
     "start": "strapi start",
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
-    "upgrade:dry": "npx @strapi/upgrade latest --dry"
+    "upgrade:dry": "npx @strapi/upgrade latest --dry",
+    "test": "jest --forceExit --detectOpenHandles"
+
   },
   "dependencies": {
     "@strapi/plugin-cloud": "5.36.0",
@@ -32,6 +34,8 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "jest": "^30.3.0",
+    "supertest": "^7.2.2",
     "typescript": "^5"
   },
   "engines": {
@@ -41,5 +45,20 @@
   "strapi": {
     "uuid": "a0bf034e-a9b5-494e-a2c6-af4e13bfb5cf",
     "installId": "d669875d5ca32af372aaf667921f7fef567f385fdfbeda8c0d90959b67b488a5"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      ".tmp",
+      ".cache"
+    ],
+    "testEnvironment": "node",
+    "setupFiles": [
+      "./jest.setup.js"
+    ],
+    "moduleNameMapper": {
+      "^/create-service$": "<rootDir>/create-service"
+    }
   }
+  
 }
