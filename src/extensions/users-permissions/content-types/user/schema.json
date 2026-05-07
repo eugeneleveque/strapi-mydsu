@@ -72,6 +72,9 @@
     "age": {
       "type": "date"
     },
+    "phone": {
+      "type": "biginteger"
+    },
     "city": {
       "type": "string"
     },
@@ -87,6 +90,18 @@
         "videos",
         "audios"
       ]
+    },
+    "gender": {
+      "type": "string"
+    },
+    "latitude": {
+      "type": "float"
+    },
+    "longitude": {
+      "type": "float"
+    },
+    "whysupress": {
+      "type": "blocks"
     },
     "organizedBookings": {
       "type": "relation",
@@ -129,9 +144,6 @@
       "relation": "oneToMany",
       "target": "api::match.match",
       "mappedBy": "user2"
-    },
-    "gender": {
-      "type": "string"
     },
     "sentMessages": {
       "type": "relation",

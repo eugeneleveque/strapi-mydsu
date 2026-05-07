@@ -42,15 +42,6 @@
         "cancelled"
       ]
     },
-    "time": {
-      "type": "time"
-    },
-    "date": {
-      "type": "date"
-    },
-    "activityName": {
-      "type": "string"
-    },
     "createdat": {
       "type": "datetime",
       "conditions": {

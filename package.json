@@ -15,12 +15,11 @@
     "upgrade": "npx @strapi/upgrade latest",
     "upgrade:dry": "npx @strapi/upgrade latest --dry",
     "test": "jest --forceExit --detectOpenHandles"
-
   },
   "dependencies": {
-    "@strapi/plugin-cloud": "5.36.0",
-    "@strapi/plugin-users-permissions": "5.36.0",
-    "@strapi/strapi": "5.36.0",
+    "@strapi/plugin-cloud": "^5.44.0",
+    "@strapi/plugin-users-permissions": "^5.44.0",
+    "@strapi/strapi": "^5.44.0",
     "better-sqlite3": "12.4.1",
     "fs-extra": "^10.0.0",
     "mime-types": "^2.1.27",
@@ -60,5 +59,4 @@
       "^/create-service$": "<rootDir>/create-service"
     }
   }
-  
 }

@@ -510,8 +510,8 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    date: Schema.Attribute.Date;
     description: Schema.Attribute.RichText;
+    endDate: Schema.Attribute.DateTime;
     image: Schema.Attribute.Media<'images'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
@@ -521,12 +521,17 @@ export interface ApiActivityActivity extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     location: Schema.Attribute.String;
     maxParticipants: Schema.Attribute.Integer;
+    minParticipants: Schema.Attribute.Integer;
+    partner: Schema.Attribute.Relation<'manyToOne', 'api::partner.partner'>;
+    presenceNumber: Schema.Attribute.JSON;
     price: Schema.Attribute.Decimal;
     publishedAt: Schema.Attribute.DateTime;
+    startDate: Schema.Attribute.DateTime;
     title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    usersNotes: Schema.Attribute.Integer;
   };
 }
 
@@ -542,12 +547,10 @@ export interface ApiBookingBooking extends Struct.CollectionTypeSchema {
   };
   attributes: {
     activity: Schema.Attribute.Relation<'oneToOne', 'api::activity.activity'>;
-    activityName: Schema.Attribute.String;
     createdat: Schema.Attribute.DateTime;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
-    date: Schema.Attribute.Date;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<
       'oneToMany',
@@ -564,7 +567,6 @@ export interface ApiBookingBooking extends Struct.CollectionTypeSchema {
     >;
     publishedAt: Schema.Attribute.DateTime;
     state: Schema.Attribute.Enumeration<['pending', 'confirmed', 'cancelled']>;
-    time: Schema.Attribute.Time;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -709,6 +711,67 @@ export interface ApiMessageMessage extends Struct.CollectionTypeSchema {
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+  };
+}
+
+export interface ApiPartnerPartner extends Struct.CollectionTypeSchema {
+  collectionName: 'partners';
+  info: {
+    displayName: 'Partners';
+    pluralName: 'partners';
+    singularName: 'partner';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    activities: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::activity.activity'
+    >;
+    address: Schema.Attribute.Text;
+    city: Schema.Attribute.String;
+    commissionRate: Schema.Attribute.Integer;
+    contactFirstName: Schema.Attribute.String;
+    contactLastName: Schema.Attribute.String;
+    contactRole: Schema.Attribute.String;
+    country: Schema.Attribute.String;
+    coverImage: Schema.Attribute.Media<
+      'images' | 'files' | 'videos' | 'audios',
+      true
+    >;
+    createdat: Schema.Attribute.DateTime;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    description: Schema.Attribute.RichText;
+    email: Schema.Attribute.Email;
+    isVerified: Schema.Attribute.Boolean;
+    latitude: Schema.Attribute.Decimal;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::partner.partner'
+    > &
+      Schema.Attribute.Private;
+    logo: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    longitude: Schema.Attribute.Decimal;
+    name: Schema.Attribute.String;
+    notes: Schema.Attribute.RichText;
+    partner_id: Schema.Attribute.UID;
+    password: Schema.Attribute.Password;
+    phone: Schema.Attribute.Integer;
+    postalCode: Schema.Attribute.Integer;
+    publishedAt: Schema.Attribute.DateTime;
+    siret: Schema.Attribute.Text;
+    states: Schema.Attribute.Enumeration<
+      ['pending', 'active', 'suspended', 'rejected']
+    >;
+    tvaNumber: Schema.Attribute.String;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    website: Schema.Attribute.String;
   };
 }
 
@@ -1187,6 +1250,7 @@ export interface PluginUsersPermissionsUser
       }>;
     gender: Schema.Attribute.String;
     interests: Schema.Attribute.JSON;
+    latitude: Schema.Attribute.Float;
     like_user: Schema.Attribute.Relation<'oneToMany', 'api::like.like'>;
     likes: Schema.Attribute.Relation<'oneToMany', 'api::like.like'>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -1195,6 +1259,7 @@ export interface PluginUsersPermissionsUser
       'plugin::users-permissions.user'
     > &
       Schema.Attribute.Private;
+    longitude: Schema.Attribute.Float;
     matches: Schema.Attribute.Relation<'oneToMany', 'api::match.match'>;
     matches2: Schema.Attribute.Relation<'oneToMany', 'api::match.match'>;
     organizedBookings: Schema.Attribute.Relation<
@@ -1210,6 +1275,7 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    phone: Schema.Attribute.BigInteger;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     receivedMessages: Schema.Attribute.Relation<
@@ -1238,6 +1304,7 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 3;
       }>;
+    whysupress: Schema.Attribute.Blocks;
   };
 }
 
@@ -1260,6 +1327,7 @@ declare module '@strapi/strapi' {
       'api::like.like': ApiLikeLike;
       'api::match.match': ApiMatchMatch;
       'api::message.message': ApiMessageMessage;
+      'api::partner.partner': ApiPartnerPartner;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;
       'plugin::i18n.locale': PluginI18NLocale;

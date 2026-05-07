@@ -17,13 +17,19 @@
     "description": {
       "type": "richtext"
     },
-    "date": {
-      "type": "date"
-    },
     "location": {
       "type": "string"
     },
+    "startDate": {
+      "type": "datetime"
+    },
+    "endDate": {
+      "type": "datetime"
+    },
     "maxParticipants": {
+      "type": "integer"
+    },
+    "minParticipants": {
       "type": "integer"
     },
     "image": {
@@ -36,6 +42,18 @@
     },
     "price": {
       "type": "decimal"
+    },
+    "usersNotes": {
+      "type": "integer"
+    },
+    "presenceNumber": {
+      "type": "json"
+    },
+    "partner": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::partner.partner",
+      "inversedBy": "activities"
     }
   }
 }

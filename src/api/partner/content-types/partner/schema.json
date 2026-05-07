@@ -1,0 +1,116 @@
+{
+  "kind": "collectionType",
+  "collectionName": "partners",
+  "info": {
+    "singularName": "partner",
+    "pluralName": "partners",
+    "displayName": "Partners"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "partner_id": {
+      "type": "uid"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "richtext"
+    },
+    "email": {
+      "type": "email"
+    },
+    "password": {
+      "type": "password"
+    },
+    "phone": {
+      "type": "integer"
+    },
+    "website": {
+      "type": "string"
+    },
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "coverImage": {
+      "type": "media",
+      "multiple": true,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "address": {
+      "type": "text"
+    },
+    "city": {
+      "type": "string"
+    },
+    "postalCode": {
+      "type": "integer"
+    },
+    "country": {
+      "type": "string"
+    },
+    "latitude": {
+      "type": "decimal"
+    },
+    "longitude": {
+      "type": "decimal"
+    },
+    "siret": {
+      "type": "text"
+    },
+    "tvaNumber": {
+      "type": "string"
+    },
+    "states": {
+      "type": "enumeration",
+      "enum": [
+        "pending",
+        "active",
+        "suspended",
+        "rejected"
+      ]
+    },
+    "isVerified": {
+      "type": "boolean"
+    },
+    "commissionRate": {
+      "type": "integer"
+    },
+    "contactFirstName": {
+      "type": "string"
+    },
+    "contactLastName": {
+      "type": "string"
+    },
+    "contactRole": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "richtext"
+    },
+    "createdat": {
+      "type": "datetime"
+    },
+    "activities": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::activity.activity",
+      "mappedBy": "partner"
+    }
+  }
+}
