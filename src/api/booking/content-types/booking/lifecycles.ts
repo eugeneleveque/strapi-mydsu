@@ -1,55 +1,52 @@
+/**
+ * Keeps `activityName` in sync with the related activity, including for
+ * bookings edited from the admin panel.
+ */
+
+const ACTIVITY_UID = 'api::activity.activity';
+const BOOKING_UID = 'api::booking.booking';
+
+// Relation payloads can be an id, a documentId, `{ id }`, `{ documentId }`,
+// or `{ connect: [...] }` / `{ set: [...] }`.
+const extractActivityRef = (value: any) => {
+  if (value === undefined || value === null) return null;
+  if (typeof value !== 'object') return value;
+  const list = value.connect ?? value.set;
+  const entry = Array.isArray(list) ? list[0] : list ?? value;
+  if (entry === undefined || entry === null) return null;
+  return typeof entry === 'object' ? entry.id ?? entry.documentId ?? null : entry;
+};
+
+const findActivityTitle = async (ref: unknown) => {
+  const where = typeof ref === 'number' || /^\d+$/.test(String(ref))
+    ? { id: Number(ref) }
+    : { documentId: String(ref) };
+  const activity = await strapi.db.query(ACTIVITY_UID).findOne({ where, select: ['title'] });
+  return activity?.title;
+};
+
 export default {
   async beforeCreate(event) {
     const { data } = event.params;
-    
-    let activityId = null;
-    if (data.activity && data.activity.connect && data.activity.connect.length > 0) {
-      activityId = data.activity.connect[0].documentId || data.activity.connect[0].id || data.activity.connect[0];
-    }
-
-    if (activityId) {
-      // For cross-compatibility and to handle both ID types, let's use the Document Service correctly
-      const activity = await strapi.documents('api::activity.activity').findOne({
-        documentId: activityId,
-      });
-      if (activity) {
-        data.activityName = activity.title;
-      }
+    const ref = extractActivityRef(data.activity);
+    if (ref !== null) {
+      const title = await findActivityTitle(ref);
+      if (title) data.activityName = title;
     }
   },
 
   async beforeUpdate(event) {
     const { data, where } = event.params;
-    
-    let activityId = null;
-    
-    // 1. Check for changes in data
-    if (data.activity && data.activity.connect && data.activity.connect.length > 0) {
-      activityId = data.activity.connect[0].documentId || data.activity.connect[0].id || data.activity.connect[0];
-    }
-    
-    // 2. If not found, look up existing booking by ID (numeric or documentId)
-    if (!activityId) {
-      // In Strapi 5 lifecycles, WHERE often contains the numeric ID
-      const booking = await strapi.db.query('api::booking.booking').findOne({
-        where: where,
-        populate: ['activity']
-      });
-      
-      if (booking && booking.activity) {
-        // We need the documentId of the activity to fetch it via Document Service, or just use what we have
-        activityId = booking.activity.documentId || booking.activity.id;
-      }
+    let ref = extractActivityRef(data.activity);
+
+    if (ref === null) {
+      const booking = await strapi.db.query(BOOKING_UID).findOne({ where, populate: ['activity'] });
+      ref = booking?.activity?.id ?? null;
     }
 
-    if (activityId) {
-      // Use Document Service for the final title fetch as it handles localization/drafts better
-      const activity = await strapi.documents('api::activity.activity').findOne({
-        documentId: activityId,
-      });
-      if (activity) {
-        data.activityName = activity.title;
-      }
+    if (ref !== null) {
+      const title = await findActivityTitle(ref);
+      if (title) data.activityName = title;
     }
   },
 };

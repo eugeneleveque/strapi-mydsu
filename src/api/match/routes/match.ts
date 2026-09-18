@@ -4,4 +4,6 @@
 
 import { factories } from '@strapi/strapi';
 
-export default factories.createCoreRouter('api::match.match');
+export default factories.createCoreRouter('api::match.match', {
+  only: ['find', 'findOne', 'delete'],
+});

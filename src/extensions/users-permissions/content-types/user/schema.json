@@ -115,12 +115,6 @@
       "target": "api::booking.booking",
       "mappedBy": "participants"
     },
-    "booking": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::booking.booking",
-      "inversedBy": "user"
-    },
     "like_user": {
       "type": "relation",
       "relation": "oneToMany",

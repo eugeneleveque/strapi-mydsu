@@ -24,7 +24,8 @@
       "type": "email"
     },
     "password": {
-      "type": "password"
+      "type": "password",
+      "private": true
     },
     "phone": {
       "type": "integer"
@@ -71,10 +72,12 @@
       "type": "decimal"
     },
     "siret": {
-      "type": "text"
+      "type": "text",
+      "private": true
     },
     "tvaNumber": {
-      "type": "string"
+      "type": "string",
+      "private": true
     },
     "states": {
       "type": "enumeration",
@@ -83,28 +86,31 @@
         "active",
         "suspended",
         "rejected"
-      ]
+      ],
+      "private": true
     },
     "isVerified": {
       "type": "boolean"
     },
     "commissionRate": {
-      "type": "integer"
+      "type": "integer",
+      "private": true
     },
     "contactFirstName": {
-      "type": "string"
+      "type": "string",
+      "private": true
     },
     "contactLastName": {
-      "type": "string"
+      "type": "string",
+      "private": true
     },
     "contactRole": {
-      "type": "string"
+      "type": "string",
+      "private": true
     },
     "notes": {
-      "type": "richtext"
-    },
-    "createdat": {
-      "type": "datetime"
+      "type": "richtext",
+      "private": true
     },
     "activities": {
       "type": "relation",

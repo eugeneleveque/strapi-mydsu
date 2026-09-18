@@ -11,16 +11,20 @@
   },
   "pluginOptions": {},
   "attributes": {
-    "user": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "plugin::users-permissions.user",
-      "mappedBy": "booking"
-    },
     "activity": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::activity.activity"
+      "relation": "manyToOne",
+      "target": "api::activity.activity",
+      "inversedBy": "bookings"
+    },
+    "activityName": {
+      "type": "string"
+    },
+    "date": {
+      "type": "date"
+    },
+    "time": {
+      "type": "time"
     },
     "organizer": {
       "type": "relation",
@@ -40,20 +44,8 @@
         "pending",
         "confirmed",
         "cancelled"
-      ]
-    },
-    "createdat": {
-      "type": "datetime",
-      "conditions": {
-        "visible": {
-          "==": [
-            {
-              "var": ""
-            },
-            ""
-          ]
-        }
-      }
+      ],
+      "default": "pending"
     }
   }
 }

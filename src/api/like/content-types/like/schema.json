@@ -28,7 +28,8 @@
       "enum": [
         "pending",
         "accepted"
-      ]
+      ],
+      "default": "pending"
     }
   }
 }
