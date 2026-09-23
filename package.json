@@ -13,7 +13,9 @@
     "strapi": "strapi",
     "upgrade": "npx @strapi/upgrade latest",
     "upgrade:dry": "npx @strapi/upgrade latest --dry",
-    "test": "jest --forceExit --detectOpenHandles"
+    "test": "jest --runInBand --forceExit",
+    "test:watch": "jest --runInBand --watch",
+    "test:coverage": "jest --runInBand --forceExit --coverage"
   },
   "dependencies": {
     "@strapi/plugin-cloud": "^5.54.0",
@@ -44,17 +46,34 @@
     "installId": "d669875d5ca32af372aaf667921f7fef567f385fdfbeda8c0d90959b67b488a5"
   },
   "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/test/**/*.test.js"
+    ],
     "testPathIgnorePatterns": [
       "/node_modules/",
-      ".tmp",
-      ".cache"
+      "/dist/",
+      "/.tmp/",
+      "/.cache/"
     ],
-    "testEnvironment": "node",
-    "setupFiles": [
-      "./jest.setup.js"
+    "testTimeout": 120000,
+    "maxWorkers": 1,
+    "collectCoverageFrom": [
+      "dist/src/**/*.js",
+      "!dist/src/admin/**"
     ],
-    "moduleNameMapper": {
-      "^/create-service$": "<rootDir>/create-service"
+    "coverageDirectory": "coverage",
+    "coverageReporters": [
+      "text-summary",
+      "lcov"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "statements": 85,
+        "branches": 65,
+        "functions": 80,
+        "lines": 85
+      }
     }
   }
 }

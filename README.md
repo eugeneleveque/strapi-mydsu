@@ -1,3 +1,51 @@
+# 🚀 Bondiz — API Strapi
+
+Backend de Bondiz : rencontre amicale (like / match), messagerie entre matchs,
+et réservation d'activités auprès de partenaires.
+
+## Démarrer
+
+```bash
+npm install
+cp .env.example .env   # puis renseigner les secrets
+npm run develop
+```
+
+## Tests
+
+Les tests d'intégration démarrent une vraie instance Strapi sur une base SQLite
+jetable (une par suite) et interrogent l'API par HTTP. Ils ne touchent jamais la
+base de développement ni le stockage Supabase.
+
+```bash
+npm test               # toutes les suites
+npm run test:coverage  # avec le rapport de couverture
+npx jest test/integration/conversation.test.js   # une seule suite
+```
+
+Organisation :
+
+| Fichier | Couvre |
+|---|---|
+| `test/integration/users.test.js` | inscription, connexion, cloisonnement des profils |
+| `test/integration/like-match.test.js` | likes, création automatique du match |
+| `test/integration/conversation.test.js` | chat entre matchs, non-lus, archivage |
+| `test/integration/booking.test.js` | réservations, groupes, places, états |
+| `test/integration/discover.test.js` | profils à découvrir, filtres, distance |
+| `test/integration/upload.test.js` | envoi d'images, droits sur les fichiers |
+| `test/integration/services.test.js` | règles métier au niveau des services |
+| `test/helpers/` | démarrage de Strapi, remise à zéro, fabriques de données |
+
+Les tests s'exécutent en série (`--runInBand`) : chaque suite démarre son
+propre Strapi.
+
+## Intégration continue
+
+`.github/workflows/ci.yml` lance les tests et la couverture à chaque push et
+pull request, puis construit l'image Docker de production.
+
+---
+
 # 🚀 Getting started with Strapi
 
 Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/dev-docs/cli) (CLI) which lets you scaffold and manage your project in seconds.

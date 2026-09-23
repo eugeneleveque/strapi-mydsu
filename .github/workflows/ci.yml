@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: Tests et couverture
+    runs-on: ubuntu-latest
+
+    env:
+      # Secrets factices : les tests tournent sur une base SQLite jetable.
+      NODE_ENV: test
+      DATABASE_CLIENT: sqlite
+      DATABASE_FILENAME: .tmp/ci.db
+      APP_KEYS: testKeyA,testKeyB
+      API_TOKEN_SALT: testApiTokenSalt
+      ADMIN_JWT_SECRET: testAdminJwtSecret
+      TRANSFER_TOKEN_SALT: testTransferTokenSalt
+      ENCRYPTION_KEY: testEncryptionKeyForCiOnly
+      JWT_SECRET: testJwtSecret
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Installation des dépendances
+        run: npm ci
+
+      - name: Compilation TypeScript
+        run: npx tsc -p tsconfig.json
+
+      - name: Tests d'intégration et couverture
+        run: npm run test:coverage
+
+      - name: Publication du rapport de couverture
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          retention-days: 7
+
+  docker:
+    name: Image Docker
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Construction de l'image
+        run: docker build --target prod -t strapi-mydsu:${{ github.sha }} .

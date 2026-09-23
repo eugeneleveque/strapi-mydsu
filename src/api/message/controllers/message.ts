@@ -7,65 +7,38 @@
  */
 
 import { factories } from '@strapi/strapi';
-import { errors } from '@strapi/utils';
 import { parseId, requireUserId } from '../../../utils/auth';
 import { findScopedOrThrow, scopedFind, scopedFindOne } from '../../../utils/scoped-controller';
 
-const { ForbiddenError, ValidationError } = errors;
-
 const MESSAGE_UID = 'api::message.message';
-const MAX_LENGTH = 2000;
-
-const userScope = (userId: number) => ({
-  $or: [{ sender: { id: userId } }, { recipient: { id: userId } }],
-});
 
 export default factories.createCoreController(MESSAGE_UID, ({ strapi }) => ({
   async find(ctx) {
     const userId = requireUserId(ctx);
-    return scopedFind(this, ctx, MESSAGE_UID, userScope(userId));
+    return scopedFind(this, ctx, MESSAGE_UID, strapi.service(MESSAGE_UID).userScope(userId));
   },
 
   async findOne(ctx) {
     const userId = requireUserId(ctx);
-    return scopedFindOne(this, ctx, MESSAGE_UID, userScope(userId));
+    return scopedFindOne(this, ctx, MESSAGE_UID, strapi.service(MESSAGE_UID).userScope(userId));
   },
 
   async create(ctx) {
     const userId = requireUserId(ctx);
     const body = ctx.request.body?.data ?? {};
-
     const recipientId = parseId(body.recipient, 'recipient');
-    const content = typeof body.content === 'string' ? body.content.trim() : '';
-    if (!content) {
-      throw new ValidationError('Le message ne peut pas être vide.');
-    }
-    if (content.length > MAX_LENGTH) {
-      throw new ValidationError(`Le message ne peut pas dépasser ${MAX_LENGTH} caractères.`);
-    }
 
-    if (!(await strapi.service('api::match.match').areMatched(userId, recipientId))) {
-      throw new ForbiddenError('Vous ne pouvez écrire qu’à vos matchs.');
-    }
-
-    const data: { content: string; [key: string]: unknown } = {
-      content,
-      sender: userId,
-      recipient: recipientId,
-      isRead: false,
-      sentAt: new Date(),
-    };
-
+    let bookingId: number | undefined;
     if (body.booking) {
       const booking = await findScopedOrThrow(
         'api::booking.booking',
         String(body.booking?.documentId ?? body.booking),
         strapi.service('api::booking.booking').userScope(userId)
       );
-      data.booking = booking.id;
+      bookingId = booking.id;
     }
 
-    const message = await strapi.documents(MESSAGE_UID).create({ data });
+    const message = await strapi.service(MESSAGE_UID).send(userId, recipientId, body.content, bookingId);
 
     const sanitized = await this.sanitizeOutput(message, ctx);
     ctx.status = 201;
@@ -77,7 +50,9 @@ export default factories.createCoreController(MESSAGE_UID, ({ strapi }) => ({
    */
   async update(ctx) {
     const userId = requireUserId(ctx);
-    await findScopedOrThrow(MESSAGE_UID, ctx.params.id, { recipient: { id: userId } });
+    await findScopedOrThrow(MESSAGE_UID, ctx.params.id, {
+      $and: [{ recipient: { id: userId } }, strapi.service(MESSAGE_UID).notDeleted()],
+    });
 
     const message = await strapi.documents(MESSAGE_UID).update({
       documentId: ctx.params.id,
@@ -88,9 +63,19 @@ export default factories.createCoreController(MESSAGE_UID, ({ strapi }) => ({
     return this.transformResponse(sanitized);
   },
 
+  /**
+   * The sender archives their own message: it disappears from the API
+   * but stays in database for moderation.
+   */
   async delete(ctx) {
     const userId = requireUserId(ctx);
-    await findScopedOrThrow(MESSAGE_UID, ctx.params.id, { sender: { id: userId } });
-    return super.delete(ctx);
+    const messageService = strapi.service(MESSAGE_UID);
+    const message = await findScopedOrThrow(MESSAGE_UID, ctx.params.id, {
+      $and: [{ sender: { id: userId } }, messageService.notDeleted()],
+    });
+
+    await messageService.archive({ id: message.id }, 'sender');
+
+    ctx.status = 204;
   },
 }));

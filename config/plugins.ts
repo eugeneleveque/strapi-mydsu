@@ -4,14 +4,18 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
   // SUPABASE_* are the expected names; DATABASE_* are kept for backward compatibility.
   const supabaseUrl = env('SUPABASE_API_URL', env('DATABASE_API_URL'));
 
+  // 10 MB is plenty for profile pictures.
+  const sizeLimit = env.int('UPLOAD_SIZE_LIMIT', 10 * 1024 * 1024);
+
   // Without Supabase configuration (local dev, tests), files are stored in public/uploads.
   if (!supabaseUrl) {
-    return {};
+    return { upload: { config: { sizeLimit } } };
   }
 
   return {
     upload: {
       config: {
+        sizeLimit,
         provider: 'strapi-provider-upload-supabase-bucket',
         providerOptions: {
           apiUrl: supabaseUrl,

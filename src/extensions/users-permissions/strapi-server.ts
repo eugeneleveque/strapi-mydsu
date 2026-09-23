@@ -1,10 +1,7 @@
 import { errors } from '@strapi/utils';
+import { PUBLIC_PROFILE_FIELDS, pick, toPublicProfile as toPublic } from '../../utils/public-profile';
 
 const { ForbiddenError } = errors;
-
-// Fields visible on other users' profiles. Everything else (email, phone,
-// position, relations...) is only visible to the owner through /users/me.
-const PUBLIC_PROFILE_FIELDS = ['id', 'documentId', 'username', 'bio', 'age', 'city', 'interests', 'gender', 'self_image'];
 
 // Fields a user can never change through PUT /users/:id.
 const PROTECTED_FIELDS = [
@@ -25,15 +22,8 @@ const PROTECTED_FIELDS = [
   'receivedMessages',
 ];
 
-const pick = (object: Record<string, any>, keys: string[]) =>
-  Object.fromEntries(keys.filter((key) => key in object).map((key) => [key, object[key]]));
-
-const toPublicProfile = (user: any, currentUserId?: number) => {
-  if (!user || typeof user !== 'object' || user.id === currentUserId) {
-    return user;
-  }
-  return pick(user, PUBLIC_PROFILE_FIELDS);
-};
+const toPublicProfile = (user: any, currentUserId?: number) =>
+  user && typeof user === 'object' && user.id === currentUserId ? user : toPublic(user);
 
 const isSelf = (ctx) => String(ctx.state?.user?.id) === String(ctx.params.id);
 

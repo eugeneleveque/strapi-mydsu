@@ -70,17 +70,16 @@ export default factories.createCoreService(BOOKING_UID, ({ strapi }) => ({
     return activity;
   },
 
-  async createForOrganizer(
-    organizerId: number,
-    input: { activity?: unknown; participants?: unknown[]; date?: string; time?: string }
-  ) {
-    this.validateDateTime(input);
-    const activity = await this.findActivity(input.activity);
-
-    if (input.participants !== undefined && !Array.isArray(input.participants)) {
+  /**
+   * Normalizes a participant list and checks that each one is a match of the
+   * organizer and that the activity still has room (the organizer takes a seat).
+   */
+  async validateParticipants(organizerId: number, participants: unknown, activity: any) {
+    if (participants !== undefined && !Array.isArray(participants)) {
       throw new ValidationError('Le champ "participants" doit être une liste.');
     }
-    const participantIds = [...new Set((input.participants ?? []).map((p: any) => Number(p?.id ?? p)))]
+
+    const participantIds = [...new Set(((participants ?? []) as any[]).map((p: any) => Number(p?.id ?? p)))]
       .filter((id) => id !== organizerId);
 
     if (participantIds.some((id) => !Number.isInteger(id) || id <= 0)) {
@@ -94,10 +93,20 @@ export default factories.createCoreService(BOOKING_UID, ({ strapi }) => ({
       }
     }
 
-    // The organizer takes a seat too.
-    if (activity.maxParticipants && participantIds.length + 1 > activity.maxParticipants) {
+    if (activity?.maxParticipants && participantIds.length + 1 > activity.maxParticipants) {
       throw new ValidationError(`Cette activité est limitée à ${activity.maxParticipants} participants.`);
     }
+
+    return participantIds;
+  },
+
+  async createForOrganizer(
+    organizerId: number,
+    input: { activity?: unknown; participants?: unknown[]; date?: string; time?: string }
+  ) {
+    this.validateDateTime(input);
+    const activity = await this.findActivity(input.activity);
+    const participantIds = await this.validateParticipants(organizerId, input.participants, activity);
 
     return strapi.documents(BOOKING_UID).create({
       data: {

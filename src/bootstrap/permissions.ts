@@ -15,6 +15,8 @@ const PERMISSION_UID = 'plugin::users-permissions.permission';
 const MANAGED_PREFIXES = [
   'api::activity.',
   'api::booking.',
+  'api::conversation.',
+  'api::discover.',
   'api::like.',
   'api::match.',
   'api::message.',
@@ -47,7 +49,9 @@ const PERMISSIONS: Record<string, { managed: string[]; ensured: string[] }> = {
       ...crud('api::like.like', ['find', 'findOne', 'create', 'delete']),
       ...crud('api::match.match', ['find', 'findOne', 'delete']),
       ...crud('api::message.message', ['find', 'findOne', 'create', 'update', 'delete']),
-      ...crud('api::booking.booking', ['find', 'findOne', 'create', 'update', 'delete']),
+      ...crud('api::booking.booking', ['find', 'findOne', 'create', 'update', 'delete', 'leave']),
+      'api::discover.discover.find',
+      ...crud('api::conversation.conversation', ['find', 'findOne', 'messages', 'send', 'read']),
       ...crud('plugin::users-permissions.user', ['me', 'find', 'findOne', 'update', 'destroy']),
     ],
     ensured: [

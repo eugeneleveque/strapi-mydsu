@@ -38,6 +38,18 @@
     },
     "sentAt": {
       "type": "datetime"
+    },
+    "deletedAt": {
+      "type": "datetime",
+      "private": true
+    },
+    "deletedReason": {
+      "type": "enumeration",
+      "enum": [
+        "unmatch",
+        "sender"
+      ],
+      "private": true
     }
   }
 }

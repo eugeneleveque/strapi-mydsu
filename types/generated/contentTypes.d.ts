@@ -644,6 +644,9 @@ export interface ApiMessageMessage extends Struct.CollectionTypeSchema {
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    deletedAt: Schema.Attribute.DateTime & Schema.Attribute.Private;
+    deletedReason: Schema.Attribute.Enumeration<['unmatch', 'sender']> &
+      Schema.Attribute.Private;
     isRead: Schema.Attribute.Boolean & Schema.Attribute.DefaultTo<false>;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
     localizations: Schema.Attribute.Relation<

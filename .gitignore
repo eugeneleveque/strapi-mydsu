@@ -135,3 +135,5 @@ build
 ############################
 
 strapi-MYDSU
+# Tests
+coverage
