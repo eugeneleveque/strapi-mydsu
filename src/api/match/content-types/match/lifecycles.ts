@@ -1,20 +1,25 @@
 /**
  * Unmatching closes the conversation: the messages exchanged by the two users
  * are archived (soft delete with `deletedAt`), so they disappear from the API
- * while staying available for moderation.
+ * while staying available for moderation. The likes between the two users are
+ * deleted outright: `/discover` permanently excludes anyone already liked, so
+ * keeping the old likes around would make the pair invisible to each other
+ * forever with no way to match again. Deleting them lets a future mutual like
+ * create a fresh match.
  *
  * Implemented as a lifecycle so it also applies to deletions made from the
  * admin panel.
  *
  * A match exists as two rows (draft and published), and Strapi fires the
  * delete hooks once per row, in parallel. The pairs are collected before the
- * delete; the messages are archived only when no row of that document is left
+ * delete; the cleanup runs only when no row of that document is left
  * (so unpublishing does not close the chat), and a short-lived guard makes
- * sure the parallel calls archive the conversation only once.
+ * sure the parallel calls run it only once.
  */
 
 const MATCH_UID = 'api::match.match';
 const MESSAGE_UID = 'api::message.message' as const;
+const LIKE_UID = 'api::like.like' as const;
 
 // documentId -> timestamp, to ignore the twin call of the other version.
 const recentlyArchived = new Map<string, number>();
@@ -71,6 +76,19 @@ const deleteConversations = async (event) => {
 
     if (count > 0) {
       strapi.log.info(`[unmatch] ${count} message(s) archivé(s) avec le match ${documentId}.`);
+    }
+
+    const deletedLikes = await strapi.db.query(LIKE_UID).deleteMany({
+      where: {
+        $or: [
+          { fromUser: { id: user1Id }, toUser: { id: user2Id } },
+          { fromUser: { id: user2Id }, toUser: { id: user1Id } },
+        ],
+      },
+    });
+
+    if (deletedLikes.count > 0) {
+      strapi.log.info(`[unmatch] ${deletedLikes.count} like(s) supprimé(s) avec le match ${documentId}.`);
     }
   }
 };

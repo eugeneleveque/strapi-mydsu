@@ -26,17 +26,29 @@ export default factories.createCoreService(MATCH_UID, ({ strapi }) => ({
     return Boolean(await this.findBetween(userA, userB));
   },
 
+  /**
+   * Le "vérifier puis créer" est fait dans une transaction : sans ça, deux
+   * likes réciproques envoyés au même instant pourraient chacun constater
+   * l'absence de match et créer deux matchs (donc deux conversations) pour
+   * la même paire. La transaction sérialise l'écriture (SQLite verrouille
+   * le fichier le temps de la transaction) et empêche ce doublon.
+   */
   async ensureMatch(userA: number, userB: number) {
-    const existing = await this.findBetween(userA, userB);
-    if (existing) {
-      return existing;
-    }
+    let match;
+    await strapi.db.transaction(async () => {
+      const existing = await this.findBetween(userA, userB);
+      if (existing) {
+        match = existing;
+        return;
+      }
 
-    const { user1, user2 } = this.orderPair(userA, userB);
-    return strapi.documents(MATCH_UID).create({
-      data: { user1, user2 },
-      status: 'published',
+      const { user1, user2 } = this.orderPair(userA, userB);
+      match = await strapi.documents(MATCH_UID).create({
+        data: { user1, user2 },
+        status: 'published',
+      });
     });
+    return match;
   },
 
   /**
