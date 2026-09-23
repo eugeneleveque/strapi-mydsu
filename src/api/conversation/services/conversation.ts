@@ -35,7 +35,7 @@ export default ({ strapi }) => ({
         ...(isNumeric ? { id: Number(matchRef) } : { documentId: String(matchRef) }),
         publishedAt: { $notNull: true },
       },
-      populate: { user1: true, user2: true },
+      populate: { user1: { populate: { self_image: true } }, user2: { populate: { self_image: true } } },
     });
 
     if (!match) {
