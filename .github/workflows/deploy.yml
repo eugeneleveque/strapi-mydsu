@@ -1,0 +1,70 @@
+name: Déploiement
+
+# Déclenchement manuel : onglet Actions → "Déploiement" → "Run workflow".
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Étiquette de l'image à déployer (latest, ou sha-<commit> pour revenir en arrière)"
+        required: true
+        default: latest
+
+jobs:
+  deploy:
+    name: Mise en production
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Préparation de la clé SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -p "${{ secrets.VPS_PORT || 22 }}" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Envoi de la configuration Docker Compose
+        run: |
+          scp -i ~/.ssh/deploy_key -P "${{ secrets.VPS_PORT || 22 }}" \
+            docker-compose.prod.yml \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/opt/bondiz/docker-compose.prod.yml"
+
+      - name: Déploiement
+        run: |
+          ssh -i ~/.ssh/deploy_key -p "${{ secrets.VPS_PORT || 22 }}" \
+            "${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}" \
+            "STRAPI_IMAGE=ghcr.io/${{ github.repository }}:${{ inputs.image_tag }} bash -s" <<'EOF'
+          set -euo pipefail
+          cd /opt/bondiz
+
+          echo "→ Image déployée : $STRAPI_IMAGE"
+          export STRAPI_IMAGE
+
+          docker compose -f docker-compose.prod.yml pull
+          docker compose -f docker-compose.prod.yml up -d --remove-orphans
+
+          # On attend que le conteneur se déclare en bonne santé.
+          for i in $(seq 1 30); do
+            etat=$(docker inspect --format '{{.State.Health.Status}}' bondiz-api 2>/dev/null || echo "absent")
+            echo "   état : $etat"
+            [ "$etat" = "healthy" ] && exit 0
+            [ "$etat" = "unhealthy" ] && break
+            sleep 5
+          done
+
+          echo "✗ L'API ne répond pas. Journaux :"
+          docker compose -f docker-compose.prod.yml logs --tail 50 strapi
+          exit 1
+          EOF
+
+      - name: Vérification publique
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' "${{ secrets.API_PUBLIC_URL }}/_health")
+          echo "GET /_health → $code"
+          [ "$code" = "204" ]
+
+      - name: Nettoyage de la clé
+        if: always()
+        run: rm -f ~/.ssh/deploy_key
