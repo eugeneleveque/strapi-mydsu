@@ -9,6 +9,7 @@ const { ValidationError, NotFoundError } = errors;
 
 const LIKE_UID = 'api::like.like';
 const USER_UID = 'plugin::users-permissions.user';
+const PUSH_UID = 'api::push-subscription.push-subscription';
 
 export default factories.createCoreService(LIKE_UID, ({ strapi }) => ({
   /**
@@ -38,7 +39,13 @@ export default factories.createCoreService(LIKE_UID, ({ strapi }) => ({
       return { like, match: null };
     }
 
-    const match = await strapi.service('api::match.match').ensureMatch(fromUserId, toUserId);
+    const matchService = strapi.service('api::match.match');
+    const isNewMatch = !(await matchService.areMatched(fromUserId, toUserId));
+    const match = await matchService.ensureMatch(fromUserId, toUserId);
+
+    if (isNewMatch) {
+      await this.notifyMatch(fromUserId, toUserId, match.documentId);
+    }
 
     for (const { documentId, state } of [like, reverseLike]) {
       if (state !== 'accepted') {
@@ -48,6 +55,26 @@ export default factories.createCoreService(LIKE_UID, ({ strapi }) => ({
     like = { ...like, state: 'accepted' };
 
     return { like, match };
+  },
+
+  /**
+   * Push notification for the user who liked first: the one who has just
+   * liked back already sees the match in the app.
+   */
+  async notifyMatch(fromUserId: number, toUserId: number, matchDocumentId: string) {
+    const pushService = strapi.service(PUSH_UID);
+    if (!pushService.isEnabled()) return;
+
+    const liker = await strapi.db.query(USER_UID).findOne({ where: { id: fromUserId }, select: ['username'] });
+
+    pushService.notifyUserInBackground(toUserId, {
+      title: 'Nouveau match !',
+      body: liker?.username
+        ? `${liker.username} vous a liké en retour. Lancez la conversation !`
+        : 'Quelqu’un vous a liké en retour. Lancez la conversation !',
+      url: `/chat/${matchDocumentId}`,
+      tag: `match-${matchDocumentId}`,
+    });
   },
 
   async findLike(fromUserId: number, toUserId: number) {

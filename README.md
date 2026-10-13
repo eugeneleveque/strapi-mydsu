@@ -11,6 +11,46 @@ cp .env.example .env   # puis renseigner les secrets
 npm run develop
 ```
 
+## Notifications push
+
+L'API envoie des notifications Web Push aux navigateurs abonnés (la version web
+installable de l'app) :
+
+- à la réception d'un message, au destinataire ;
+- à la création d'un match, à la personne qui avait liké en premier.
+
+Elles sont désactivées tant que les clés VAPID ne sont pas renseignées : le
+reste de l'API fonctionne normalement sans elles.
+
+```bash
+npx web-push generate-vapid-keys   # une seule fois
+```
+
+| Variable | Rôle |
+|---|---|
+| `VAPID_PUBLIC_KEY` | Clé publique, transmise au navigateur |
+| `VAPID_PRIVATE_KEY` | Clé privée, à garder secrète |
+| `VAPID_SUBJECT` | Contact transmis aux services de push (`mailto:` ou `https://`) |
+
+Changer de clés invalide tous les abonnements existants.
+
+| Route | Rôle |
+|---|---|
+| `GET /api/push/public-key` | Clé publique (`null` si non configuré) |
+| `POST /api/push/subscriptions` | Abonne le navigateur de l'utilisateur connecté |
+| `POST /api/push/subscriptions/unsubscribe` | Désabonne un navigateur (`endpoint` dans le corps) |
+
+À savoir :
+
+- l'envoi part en arrière-plan : une notification en échec ne ralentit ni ne
+  fait échouer la requête qui l'a déclenchée ;
+- un abonnement que le service de push déclare expiré (404 ou 410) est supprimé ;
+- seules les adresses des services de push connus (Google, Mozilla, Apple,
+  Microsoft) sont acceptées comme `endpoint` ;
+- les abonnements sont supprimés avec le compte.
+
+Le code est dans `src/api/push-subscription/`.
+
 ## Tests
 
 Les tests d'intégration démarrent une vraie instance Strapi sur une base SQLite
@@ -33,6 +73,7 @@ Organisation :
 | `test/integration/booking.test.js` | réservations, groupes, places, états |
 | `test/integration/discover.test.js` | profils à découvrir, filtres, distance |
 | `test/integration/upload.test.js` | envoi d'images, droits sur les fichiers |
+| `test/integration/push.test.js` | abonnement aux notifications, envoi, déclencheurs |
 | `test/integration/services.test.js` | règles métier au niveau des services |
 | `test/helpers/` | démarrage de Strapi, remise à zéro, fabriques de données |
 

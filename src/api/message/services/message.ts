@@ -4,6 +4,8 @@ import { errors } from '@strapi/utils';
 const { ForbiddenError, ValidationError } = errors;
 
 const MESSAGE_UID = 'api::message.message';
+const PUSH_UID = 'api::push-subscription.push-subscription';
+const USER_UID = 'plugin::users-permissions.user';
 
 const MAX_LENGTH = 2000;
 
@@ -64,11 +66,12 @@ export default factories.createCoreService(MESSAGE_UID, ({ strapi }) => ({
   async send(senderId: number, recipientId: number, content: unknown, bookingId?: number) {
     const text = this.validateContent(content);
 
-    if (!(await strapi.service('api::match.match').areMatched(senderId, recipientId))) {
+    const match = await strapi.service('api::match.match').findBetween(senderId, recipientId);
+    if (!match) {
       throw new ForbiddenError('Vous ne pouvez écrire qu’à vos matchs.');
     }
 
-    return strapi.documents(MESSAGE_UID).create({
+    const message = await strapi.documents(MESSAGE_UID).create({
       data: {
         content: text,
         sender: senderId,
@@ -77,6 +80,27 @@ export default factories.createCoreService(MESSAGE_UID, ({ strapi }) => ({
         sentAt: new Date(),
         ...(bookingId ? { booking: bookingId } : {}),
       },
+    });
+
+    await this.notifyRecipient(senderId, recipientId, text, match.documentId);
+
+    return message;
+  },
+
+  /**
+   * Push notification for a new message. The send itself is not awaited.
+   */
+  async notifyRecipient(senderId: number, recipientId: number, text: string, matchDocumentId: string) {
+    const pushService = strapi.service(PUSH_UID);
+    if (!pushService.isEnabled()) return;
+
+    const sender = await strapi.db.query(USER_UID).findOne({ where: { id: senderId }, select: ['username'] });
+
+    pushService.notifyUserInBackground(recipientId, {
+      title: sender?.username ?? 'Nouveau message',
+      body: text,
+      url: `/chat/${matchDocumentId}`,
+      tag: `chat-${matchDocumentId}`,
     });
   },
 
