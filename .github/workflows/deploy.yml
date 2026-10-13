@@ -23,7 +23,17 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p "${{ secrets.VPS_PORT || 22 }}" -H "${{ secrets.VPS_HOST }}" >> ~/.ssh/known_hosts
+
+          # La clé d'hôte est épinglée via un secret, relevé une fois sur un
+          # réseau de confiance. Un ssh-keyscan à chaque exécution reviendrait
+          # à faire confiance au premier serveur qui répond, et laisserait
+          # passer une interception.
+          if [ -z "${{ secrets.VPS_KNOWN_HOSTS }}" ]; then
+            echo "✗ Secret VPS_KNOWN_HOSTS manquant (voir deploy/README.md)."
+            exit 1
+          fi
+          echo "${{ secrets.VPS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
 
       - name: Envoi de la configuration Docker Compose
         run: |

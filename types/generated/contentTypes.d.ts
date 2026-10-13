@@ -686,6 +686,21 @@ export interface ApiPartnerPartner extends Struct.CollectionTypeSchema {
       'api::activity.activity'
     >;
     address: Schema.Attribute.Text;
+    category: Schema.Attribute.Enumeration<
+      [
+        'restaurant',
+        'bar',
+        'cafe',
+        'bowling',
+        'escape_game',
+        'cinema',
+        'museum',
+        'sport',
+        'karaoke',
+        'concert_venue',
+        'other',
+      ]
+    >;
     city: Schema.Attribute.String;
     commissionRate: Schema.Attribute.Integer & Schema.Attribute.Private;
     contactFirstName: Schema.Attribute.String & Schema.Attribute.Private;
@@ -701,6 +716,11 @@ export interface ApiPartnerPartner extends Struct.CollectionTypeSchema {
       Schema.Attribute.Private;
     description: Schema.Attribute.RichText;
     email: Schema.Attribute.Email;
+    google_place_id: Schema.Attribute.String &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 255;
+      }>;
     isVerified: Schema.Attribute.Boolean;
     latitude: Schema.Attribute.Decimal;
     locale: Schema.Attribute.String & Schema.Attribute.Private;
@@ -728,6 +748,46 @@ export interface ApiPartnerPartner extends Struct.CollectionTypeSchema {
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
     website: Schema.Attribute.String;
+  };
+}
+
+export interface ApiProfileViewProfileView extends Struct.CollectionTypeSchema {
+  collectionName: 'profile_views';
+  info: {
+    description: 'Trace qui a vu quel profil, sans engagement : un profil vu reste propos\u00E9 par /discover.';
+    displayName: 'Profile view';
+    pluralName: 'profile-views';
+    singularName: 'profile-view';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    action: Schema.Attribute.Enumeration<['seen', 'skipped']> &
+      Schema.Attribute.DefaultTo<'seen'>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::profile-view.profile-view'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    seenAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    viewCount: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<1>;
+    viewed: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+    viewer: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
   };
 }
 
@@ -1322,6 +1382,7 @@ declare module '@strapi/strapi' {
       'api::match.match': ApiMatchMatch;
       'api::message.message': ApiMessageMessage;
       'api::partner.partner': ApiPartnerPartner;
+      'api::profile-view.profile-view': ApiProfileViewProfileView;
       'api::push-subscription.push-subscription': ApiPushSubscriptionPushSubscription;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

@@ -1,4 +1,8 @@
-version: '3.8'
+# Développement local uniquement : rechargement à chaud, code monté depuis
+# le disque. Pour la production, utiliser docker-compose.prod.yml, qui part
+# de l'image publiée et tourne en NODE_ENV=production.
+#
+#   docker compose -f docker-compose.dev.yml up
 
 services:
   strapi:
@@ -8,10 +12,17 @@ services:
       target: dev
     image: strapi-mydsu:dev
     restart: unless-stopped
+
     env_file: .env
     environment:
       NODE_ENV: development
+
     volumes:
       - ./:/opt/app
+      # Garde les dépendances de l'image : celles de l'hôte sont compilées
+      # pour macOS et ne fonctionneraient pas dans le conteneur Linux.
+      - /opt/app/node_modules
+
+    # Jamais exposé au-delà de la machine de développement.
     ports:
-      - "1337:1337"
+      - "127.0.0.1:1337:1337"
