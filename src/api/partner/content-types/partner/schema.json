@@ -17,6 +17,27 @@
     "name": {
       "type": "string"
     },
+    "category": {
+      "type": "enumeration",
+      "enum": [
+        "restaurant",
+        "bar",
+        "cafe",
+        "bowling",
+        "escape_game",
+        "cinema",
+        "museum",
+        "sport",
+        "karaoke",
+        "concert_venue",
+        "other"
+      ]
+    },
+    "google_place_id": {
+      "type": "string",
+      "unique": true,
+      "maxLength": 255
+    },
     "description": {
       "type": "richtext"
     },

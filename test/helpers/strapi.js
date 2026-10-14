@@ -59,6 +59,8 @@ async function stopStrapi() {
  */
 async function resetData({ keepActivities = true } = {}) {
   const uids = [
+    'api::push-subscription.push-subscription',
+    'api::profile-view.profile-view',
     'api::message.message',
     'api::booking.booking',
     'api::like.like',

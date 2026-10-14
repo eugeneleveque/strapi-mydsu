@@ -1,0 +1,34 @@
+# Déploiement du VPS : ce fichier est copié dans /opt/bondiz sur le serveur,
+# à côté d'un fichier .env contenant les secrets de production.
+#
+#   docker compose -f docker-compose.prod.yml pull
+#   docker compose -f docker-compose.prod.yml up -d
+
+services:
+  strapi:
+    # Image construite et publiée par GitHub Actions.
+    # STRAPI_IMAGE permet de déployer une version précise (retour arrière).
+    image: ${STRAPI_IMAGE:-ghcr.io/eugeneleveque/strapi-mydsu:latest}
+    container_name: bondiz-api
+    restart: unless-stopped
+
+    env_file: .env
+    environment:
+      NODE_ENV: production
+
+    # Exposé uniquement en local : c'est Nginx qui fait face à Internet.
+    ports:
+      - "127.0.0.1:1337:1337"
+
+    volumes:
+      # Filet de sécurité si le stockage Supabase n'est pas configuré.
+      - uploads:/opt/app/public/uploads
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  uploads:

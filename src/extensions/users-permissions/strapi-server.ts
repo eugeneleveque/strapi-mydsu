@@ -67,6 +67,10 @@ export default (plugin) => {
     if (!isSelf(ctx)) {
       throw new ForbiddenError('Vous ne pouvez supprimer que votre propre compte.');
     }
+    // A deleted account must not keep receiving notifications. Done first:
+    // once the user is gone, the subscriptions can no longer be found by owner.
+    await strapi.service('api::push-subscription.push-subscription').removeAllForUser(Number(ctx.params.id));
+
     return destroy(ctx);
   };
 

@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "profile_views",
+  "info": {
+    "singularName": "profile-view",
+    "pluralName": "profile-views",
+    "displayName": "Profile view",
+    "description": "Trace qui a vu quel profil, sans engagement : un profil vu reste proposé par /discover."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "viewer": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "viewed": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "plugin::users-permissions.user"
+    },
+    "action": {
+      "type": "enumeration",
+      "enum": [
+        "seen",
+        "skipped"
+      ],
+      "default": "seen"
+    },
+    "seenAt": {
+      "type": "datetime"
+    },
+    "viewCount": {
+      "type": "integer",
+      "default": 1
+    }
+  }
+}

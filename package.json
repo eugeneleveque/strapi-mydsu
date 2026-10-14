@@ -21,18 +21,24 @@
     "@strapi/plugin-cloud": "^5.54.0",
     "@strapi/plugin-users-permissions": "^5.54.0",
     "@strapi/strapi": "^5.54.0",
-    "better-sqlite3": "12.4.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-router-dom": "^6.0.0",
     "strapi-provider-upload-supabase-bucket": "^1.0.0",
-    "styled-components": "^6.0.0"
+    "styled-components": "^6.0.0",
+    "web-push": "^3.6.7"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/web-push": "^3.6.4",
+    "better-sqlite3": "12.4.1",
     "jest": "^30.3.0",
     "supertest": "^7.2.2",
     "typescript": "^5"
