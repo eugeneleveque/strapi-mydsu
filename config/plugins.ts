@@ -7,15 +7,23 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
   // 10 MB is plenty for profile pictures.
   const sizeLimit = env.int('UPLOAD_SIZE_LIMIT', 10 * 1024 * 1024);
 
+  // Checked against the real file content, not only the declared type.
+  // Partners may also attach PDF documents and videos.
+  const security = {
+    allowedTypes: ['image/*', 'video/*', 'application/pdf'],
+    deniedTypes: ['image/svg+xml'],
+  };
+
   // Without Supabase configuration (local dev, tests), files are stored in public/uploads.
   if (!supabaseUrl) {
-    return { upload: { config: { sizeLimit } } };
+    return { upload: { config: { sizeLimit, security } } };
   }
 
   return {
     upload: {
       config: {
         sizeLimit,
+        security,
         provider: 'strapi-provider-upload-supabase-bucket',
         providerOptions: {
           apiUrl: supabaseUrl,
