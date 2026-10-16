@@ -30,14 +30,27 @@ async function createUser(profile = {}) {
     throw new Error(`createUser failed: ${res.status} ${JSON.stringify(res.body)}`);
   }
 
-  const { city, gender, age, interests, latitude, longitude, blocked } = profile;
-  const columns = { city, gender, age, interests, latitude, longitude, blocked };
+  const { city, gender, age, latitude, longitude, blocked, firstName, lastName } = profile;
+  const columns = { city, gender, age, latitude, longitude, blocked, firstName, lastName };
   const data = Object.fromEntries(Object.entries(columns).filter(([, value]) => value !== undefined));
 
   if (Object.keys(data).length > 0) {
     await strapi.db.query('plugin::users-permissions.user').update({
       where: { id: res.body.user.id },
       data,
+    });
+  }
+
+  // Les centres d'intérêt sont une relation vers le catalogue : on accepte
+  // des slugs (['badminton']) pour que les tests restent lisibles.
+  if (profile.interests?.length > 0) {
+    const tags = await strapi.db.query('api::interest.interest').findMany({
+      where: { slug: { $in: profile.interests } },
+      select: ['id'],
+    });
+    await strapi.db.query('plugin::users-permissions.user').update({
+      where: { id: res.body.user.id },
+      data: { interestTags: tags.map((tag) => tag.id) },
     });
   }
 

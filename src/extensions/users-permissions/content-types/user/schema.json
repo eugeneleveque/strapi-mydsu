@@ -26,6 +26,15 @@
       "configurable": false,
       "required": true
     },
+    "firstName": {
+      "type": "string",
+      "maxLength": 50
+    },
+    "lastName": {
+      "type": "string",
+      "maxLength": 50,
+      "private": true
+    },
     "provider": {
       "type": "string",
       "configurable": false
@@ -78,8 +87,11 @@
     "city": {
       "type": "string"
     },
-    "interests": {
-      "type": "json"
+    "interestTags": {
+      "type": "relation",
+      "relation": "manyToMany",
+      "target": "api::interest.interest",
+      "inversedBy": "users"
     },
     "self_image": {
       "type": "media",

@@ -102,6 +102,8 @@ export default ({ strapi }) => ({
       where.longitude = { $gte: originLon - lonDelta, $lte: originLon + lonDelta };
     }
 
+    const category = typeof query.category === 'string' ? query.category.trim() : '';
+
     const interests = typeof query.interests === 'string'
       ? query.interests.split(',').map((interest) => interest.trim()).filter(Boolean)
       : Array.isArray(query.interests)
@@ -114,9 +116,14 @@ export default ({ strapi }) => ({
     const fetchLimit = needsMemoryFilter ? pageSize * 5 : pageSize;
     const fetchOffset = needsMemoryFilter ? 0 : (page - 1) * pageSize;
 
+    // Le catalogue (relation) se filtre en base, contrairement au champ JSON.
+    if (category) {
+      where.interestTags = { category: { slug: category } };
+    }
+
     const users = await strapi.db.query(USER_UID).findMany({
       where,
-      populate: { self_image: true },
+      populate: { self_image: true, interestTags: { populate: { category: true } } },
       orderBy: { id: 'asc' },
       limit: fetchLimit,
       offset: fetchOffset,
@@ -132,7 +139,8 @@ export default ({ strapi }) => ({
 
     if (interests.length > 0) {
       candidates = candidates.filter((candidate) => {
-        const theirs = Array.isArray(candidate.interests) ? candidate.interests : [];
+        // Accepte le nom ou le slug : « Badminton » comme « badminton ».
+        const theirs = (candidate.interestTags ?? []).flatMap((tag: any) => [tag.name, tag.slug]);
         return interests.some((interest) => theirs.includes(interest));
       });
     }
