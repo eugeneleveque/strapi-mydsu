@@ -6,10 +6,11 @@ export const PUBLIC_PROFILE_FIELDS = [
   'id',
   'documentId',
   'username',
+  'firstName',
   'bio',
   'age',
   'city',
-  'interests',
+  'interestTags',
   'gender',
   'self_image',
 ];

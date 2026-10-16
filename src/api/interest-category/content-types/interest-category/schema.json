@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "interest_categories",
+  "info": {
+    "singularName": "interest-category",
+    "pluralName": "interest-categories",
+    "displayName": "Interest category",
+    "description": "Famille de centres d'intérêt (Sport, Art…), affichée en tête de groupe dans le questionnaire."
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true,
+      "unique": true,
+      "maxLength": 60
+    },
+    "slug": {
+      "type": "uid",
+      "targetField": "name",
+      "required": true
+    },
+    "icon": {
+      "type": "string",
+      "maxLength": 60
+    },
+    "sortOrder": {
+      "type": "integer",
+      "default": 0
+    },
+    "interests": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::interest.interest",
+      "mappedBy": "category"
+    }
+  }
+}

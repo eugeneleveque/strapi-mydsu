@@ -93,7 +93,7 @@ describe('Filtres', () => {
   it('filtre par centres d’intérêt', async () => {
     const moi = await createUser();
     const grimpeur = await createUser({ interests: ['escalade', 'cinema'] });
-    await createUser({ interests: ['jazz'] });
+    await createUser({ interests: ['yoga'] });
 
     const res = await as(moi).get('/api/discover?interests=escalade');
 

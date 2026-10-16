@@ -14,6 +14,8 @@ const PERMISSION_UID = 'plugin::users-permissions.permission';
 
 const MANAGED_PREFIXES = [
   'api::activity.',
+  'api::interest.',
+  'api::interest-category.',
   'api::booking.',
   'api::conversation.',
   'api::discover.',
@@ -33,6 +35,8 @@ const PERMISSIONS: Record<string, { managed: string[]; ensured: string[] }> = {
     managed: [
       ...crud('api::activity.activity', ['find', 'findOne']),
       ...crud('api::partner.partner', ['find', 'findOne']),
+      ...crud('api::interest.interest', ['find', 'findOne']),
+      ...crud('api::interest-category.interest-category', ['find', 'findOne']),
     ],
     ensured: crud('plugin::users-permissions.auth', [
       'callback',
@@ -48,6 +52,8 @@ const PERMISSIONS: Record<string, { managed: string[]; ensured: string[] }> = {
     managed: [
       ...crud('api::activity.activity', ['find', 'findOne']),
       ...crud('api::partner.partner', ['find', 'findOne']),
+      ...crud('api::interest.interest', ['find', 'findOne']),
+      ...crud('api::interest-category.interest-category', ['find', 'findOne']),
       ...crud('api::like.like', ['find', 'findOne', 'create', 'delete']),
       ...crud('api::match.match', ['find', 'findOne', 'delete']),
       ...crud('api::message.message', ['find', 'findOne', 'create', 'update', 'delete']),

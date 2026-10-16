@@ -562,6 +562,91 @@ export interface ApiBookingBooking extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiInterestCategoryInterestCategory
+  extends Struct.CollectionTypeSchema {
+  collectionName: 'interest_categories';
+  info: {
+    description: "Famille de centres d'int\u00E9r\u00EAt (Sport, Art\u2026), affich\u00E9e en t\u00EAte de groupe dans le questionnaire.";
+    displayName: 'Interest category';
+    pluralName: 'interest-categories';
+    singularName: 'interest-category';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    icon: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    interests: Schema.Attribute.Relation<'oneToMany', 'api::interest.interest'>;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::interest-category.interest-category'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
+    sortOrder: Schema.Attribute.Integer & Schema.Attribute.DefaultTo<0>;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
+export interface ApiInterestInterest extends Struct.CollectionTypeSchema {
+  collectionName: 'interests';
+  info: {
+    description: "Centre d'int\u00E9r\u00EAt rattach\u00E9 \u00E0 une cat\u00E9gorie (Sport \u2192 Badminton).";
+    displayName: 'Interest';
+    pluralName: 'interests';
+    singularName: 'interest';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    category: Schema.Attribute.Relation<
+      'manyToOne',
+      'api::interest-category.interest-category'
+    >;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::interest.interest'
+    > &
+      Schema.Attribute.Private;
+    name: Schema.Attribute.String &
+      Schema.Attribute.Required &
+      Schema.Attribute.Unique &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 60;
+      }>;
+    publishedAt: Schema.Attribute.DateTime;
+    slug: Schema.Attribute.UID<'name'> & Schema.Attribute.Required;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    users: Schema.Attribute.Relation<
+      'manyToMany',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiLikeLike extends Struct.CollectionTypeSchema {
   collectionName: 'likes';
   info: {
@@ -1304,8 +1389,20 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
+    firstName: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }>;
     gender: Schema.Attribute.String;
-    interests: Schema.Attribute.JSON;
+    interestTags: Schema.Attribute.Relation<
+      'manyToMany',
+      'api::interest.interest'
+    >;
+    lastName: Schema.Attribute.String &
+      Schema.Attribute.Private &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 50;
+      }>;
     latitude: Schema.Attribute.Float;
     like_user: Schema.Attribute.Relation<'oneToMany', 'api::like.like'>;
     likes: Schema.Attribute.Relation<'oneToMany', 'api::like.like'>;
@@ -1378,6 +1475,8 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::activity.activity': ApiActivityActivity;
       'api::booking.booking': ApiBookingBooking;
+      'api::interest-category.interest-category': ApiInterestCategoryInterestCategory;
+      'api::interest.interest': ApiInterestInterest;
       'api::like.like': ApiLikeLike;
       'api::match.match': ApiMatchMatch;
       'api::message.message': ApiMessageMessage;
