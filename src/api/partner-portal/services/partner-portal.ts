@@ -150,11 +150,33 @@ export default () => ({
     return toPartnerOutput(partner);
   },
 
+  /**
+   * documentIds of the partner's activities, read on the draft versions.
+   * A partner that was only saved as a draft in the admin (never published)
+   * can still log in, but Strapi links the published activity only to a
+   * published partner: filtering the published versions would miss them.
+   */
+  async ownActivityIds(partnerDocumentId: string, activityDocumentId?: string): Promise<string[]> {
+    const drafts = await strapi.documents(ACTIVITY_UID).findMany({
+      filters: {
+        partner: { documentId: partnerDocumentId },
+        ...(activityDocumentId ? { documentId: activityDocumentId } : {}),
+      },
+      status: 'draft',
+      fields: ['documentId'],
+      limit: 500,
+    });
+    return drafts.map((activity) => activity.documentId);
+  },
+
   async findActivities(partnerDocumentId: string) {
     await this.getPartner(partnerDocumentId);
 
+    const ids = await this.ownActivityIds(partnerDocumentId);
+    if (ids.length === 0) return [];
+
     const activities = await strapi.documents(ACTIVITY_UID).findMany({
-      filters: { partner: { documentId: partnerDocumentId } },
+      filters: { documentId: { $in: ids } },
       status: 'published',
       sort: [{ startDate: 'asc' }, { createdAt: 'desc' }],
       populate: { bookings: { fields: ['state'] } },
@@ -166,11 +188,14 @@ export default () => ({
   async findOwnActivity(partnerDocumentId: string, activityDocumentId: string) {
     await this.getPartner(partnerDocumentId);
 
-    const activity = await strapi.documents(ACTIVITY_UID).findFirst({
-      filters: { documentId: activityDocumentId, partner: { documentId: partnerDocumentId } },
-      status: 'published',
-      populate: { bookings: { fields: ['state'] } },
-    });
+    const [ownId] = await this.ownActivityIds(partnerDocumentId, activityDocumentId);
+    const activity = ownId
+      ? await strapi.documents(ACTIVITY_UID).findOne({
+          documentId: ownId,
+          status: 'published',
+          populate: { bookings: { fields: ['state'] } },
+        })
+      : null;
     if (!activity) {
       throw new NotFoundError('Activité introuvable.');
     }

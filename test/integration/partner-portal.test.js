@@ -138,6 +138,25 @@ describe('Activités', () => {
     expect(publique.body.data.partner.documentId).toBe(partner.documentId);
   });
 
+  it('retrouve les activités d’un partenaire jamais publié dans l’admin', async () => {
+    // Partenaire enregistré en brouillon seulement : il peut se connecter, mais
+    // Strapi ne relie l'activité publiée qu'à un partenaire publié.
+    const partner = await loggedPartner();
+    await strapi.documents('api::partner.partner').unpublish({ documentId: partner.documentId });
+
+    const cree = await asPartner(partner).post('/api/partner-portal/activities').send({ data: nouvelleActivite() });
+    expect(cree.status).toBe(201);
+    const url = `/api/partner-portal/activities/${cree.body.data.documentId}`;
+
+    const liste = await asPartner(partner).get('/api/partner-portal/activities');
+    expect(liste.body.data.map((a) => a.documentId)).toEqual([cree.body.data.documentId]);
+    expect((await asPartner(partner).get(url)).status).toBe(200);
+    expect((await asPartner(partner).put(url).send({ data: { title: 'Renommée' } })).body.data.title).toBe('Renommée');
+
+    const autre = await loggedPartner();
+    expect((await asPartner(autre).get(url)).status).toBe(404);
+  });
+
   it('ignore les champs que le partenaire ne doit pas fixer', async () => {
     const partner = await loggedPartner();
     const autre = await createPartner();
