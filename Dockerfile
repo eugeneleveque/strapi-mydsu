@@ -61,6 +61,8 @@ COPY --from=build --chown=node:node /opt/app/package.json ./package.json
 # et cherche la configuration à la racine au lieu de dist/.
 COPY --from=build --chown=node:node /opt/app/tsconfig.json ./tsconfig.json
 COPY --from=build --chown=node:node /opt/app/favicon.png ./favicon.png
+# Migrations de données : Strapi les lit à la racine, pas dans dist/.
+COPY --from=build --chown=node:node /opt/app/database ./database
 
 # Strapi crée ces dossiers au démarrage : ils doivent appartenir à `node`,
 # sinon le conteneur s'arrête sur une erreur de permission.

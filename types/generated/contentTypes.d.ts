@@ -562,6 +562,39 @@ export interface ApiBookingBooking extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiFavoriteFavorite extends Struct.CollectionTypeSchema {
+  collectionName: 'favorites';
+  info: {
+    description: 'Activit\u00E9s mises en favori par un utilisateur';
+    displayName: 'Favorite';
+    pluralName: 'favorites';
+    singularName: 'favorite';
+  };
+  options: {
+    draftAndPublish: false;
+  };
+  attributes: {
+    activityDocumentId: Schema.Attribute.String & Schema.Attribute.Required;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::favorite.favorite'
+    > &
+      Schema.Attribute.Private;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    user: Schema.Attribute.Relation<
+      'manyToOne',
+      'plugin::users-permissions.user'
+    >;
+  };
+}
+
 export interface ApiInterestCategoryInterestCategory
   extends Struct.CollectionTypeSchema {
   collectionName: 'interest_categories';
@@ -1428,7 +1461,10 @@ export interface PluginUsersPermissionsUser
       Schema.Attribute.SetMinMaxLength<{
         minLength: 6;
       }>;
-    phone: Schema.Attribute.BigInteger;
+    phone: Schema.Attribute.String &
+      Schema.Attribute.SetMinMaxLength<{
+        maxLength: 20;
+      }>;
     provider: Schema.Attribute.String;
     publishedAt: Schema.Attribute.DateTime;
     receivedMessages: Schema.Attribute.Relation<
@@ -1475,6 +1511,7 @@ declare module '@strapi/strapi' {
       'admin::user': AdminUser;
       'api::activity.activity': ApiActivityActivity;
       'api::booking.booking': ApiBookingBooking;
+      'api::favorite.favorite': ApiFavoriteFavorite;
       'api::interest-category.interest-category': ApiInterestCategoryInterestCategory;
       'api::interest.interest': ApiInterestInterest;
       'api::like.like': ApiLikeLike;

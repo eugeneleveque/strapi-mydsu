@@ -2,6 +2,7 @@ import type { Core } from '@strapi/strapi';
 import { syncPermissions } from './bootstrap/permissions';
 import { publishDraftOnlyDocuments } from './bootstrap/publish-drafts';
 import { captureLegacyInterests, seedInterests } from './bootstrap/interests';
+import { syncEmailSettings } from './bootstrap/emails';
 
 export default {
   /**
@@ -24,5 +25,6 @@ export default {
     await syncPermissions(strapi);
     await publishDraftOnlyDocuments(strapi);
     await seedInterests(strapi);
+    await syncEmailSettings(strapi);
   },
 };

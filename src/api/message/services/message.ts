@@ -49,6 +49,19 @@ export default factories.createCoreService(MESSAGE_UID, ({ strapi }) => ({
     return messages.length;
   },
 
+  /**
+   * Suppression définitive des messages archivés depuis plus de `days`
+   * jours : l'archive ne sert qu'à la modération, pas à garder les échanges
+   * indéfiniment (RGPD, limitation de la conservation).
+   */
+  async purgeArchived(days: number) {
+    const before = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    const { count } = await strapi.db.query(MESSAGE_UID).deleteMany({
+      where: { deletedAt: { $notNull: true, $lt: before } },
+    });
+    return count;
+  },
+
   validateContent(content: unknown) {
     const text = typeof content === 'string' ? content.trim() : '';
     if (!text) {

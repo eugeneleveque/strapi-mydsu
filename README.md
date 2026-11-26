@@ -51,6 +51,54 @@ Changer de clés invalide tous les abonnements existants.
 
 Le code est dans `src/api/push-subscription/`.
 
+## Compte et RGPD
+
+| Route | Rôle |
+|---|---|
+| `GET /api/account/export` | Toutes les données de l'utilisateur connecté, en JSON (portabilité) |
+| `POST /api/account/delete` | Supprime définitivement le compte ; `password` obligatoire dans le corps |
+| `GET /api/favorites` | documentIds des activités favorites (publiées) |
+| `PUT /api/favorites/:documentId` | Ajoute un favori (sans doublon), renvoie la liste |
+| `DELETE /api/favorites/:documentId` | Retire un favori, renvoie la liste |
+
+La suppression (`POST /api/account/delete`, et aussi `DELETE /api/users/:id`)
+efface les messages (archivés compris), likes, matchs, réservations
+organisées, consultations de profil, favoris, abonnements push et photos. Les
+réservations des autres perdent simplement ce participant. Le code est dans
+`src/api/account/`.
+
+Les messages archivés (unmatch, message retiré) sont supprimés définitivement
+chaque nuit à 3 h 30 au-delà de `MESSAGE_ARCHIVE_RETENTION_DAYS` jours (30 par
+défaut) : voir `config/cron-tasks.ts`.
+
+### Mot de passe oublié
+
+Routes de Strapi : `POST /api/auth/forgot-password` (`email`) puis
+`POST /api/auth/reset-password` (`code`, `password`, `passwordConfirmation`).
+L'e-mail, en français, mène à `$APP_URL/reset-password?code=…` ; son texte et
+ce lien sont réécrits à chaque démarrage par `src/bootstrap/emails.ts`.
+
+| Variable | Rôle |
+|---|---|
+| `APP_URL` | Adresse de l'app (`https://app.bondiz.fr` par défaut) |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE` | Serveur d'envoi ; **sans `SMTP_HOST`, aucun e-mail ne part** |
+| `SMTP_USER`, `SMTP_PASSWORD` | Identifiants SMTP |
+| `EMAIL_FROM`, `EMAIL_REPLY_TO` | Expéditeur (`Bondiz <no-reply@bondiz.fr>`) et adresse de réponse |
+
+### Carte : positions des partenaires
+
+La carte de l'app place chaque activité à la latitude et la longitude de son
+partenaire. Pour remplir celles qui manquent à partir des adresses (API Adresse
+de l'État, adresses françaises) :
+
+```bash
+node scripts/geocode-partners.js          # aperçu, ne modifie rien
+node scripts/geocode-partners.js --apply  # enregistre les positions trouvées
+```
+
+Le script vise la base Postgres du `.env`, n'écrase jamais une position déjà
+saisie et ignore les résultats incertains : ceux-là se corrigent dans l'admin.
+
 ## Tests
 
 Les tests d'intégration démarrent une vraie instance Strapi sur une base SQLite
@@ -75,6 +123,8 @@ Organisation :
 | `test/integration/upload.test.js` | envoi d'images, droits sur les fichiers |
 | `test/integration/push.test.js` | abonnement aux notifications, envoi, déclencheurs |
 | `test/integration/services.test.js` | règles métier au niveau des services |
+| `test/integration/account.test.js` | export RGPD, suppression du compte, purge des archives, mot de passe oublié |
+| `test/integration/favorite.test.js` | favoris par utilisateur |
 | `test/helpers/` | démarrage de Strapi, remise à zéro, fabriques de données |
 
 Les tests s'exécutent en série (`--runInBand`) : chaque suite démarre son

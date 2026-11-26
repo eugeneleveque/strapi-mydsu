@@ -13,6 +13,8 @@ const ROLE_UID = 'plugin::users-permissions.role';
 const PERMISSION_UID = 'plugin::users-permissions.permission';
 
 const MANAGED_PREFIXES = [
+  'api::account.',
+  'api::favorite.',
   'api::activity.',
   'api::interest.',
   'api::interest-category.',
@@ -62,6 +64,8 @@ const PERMISSIONS: Record<string, { managed: string[]; ensured: string[] }> = {
       ...crud('api::conversation.conversation', ['find', 'findOne', 'messages', 'send', 'read']),
       ...crud('api::push-subscription.push-subscription', ['publicKey', 'subscribe', 'unsubscribe']),
       ...crud('api::profile-view.profile-view', ['find', 'record']),
+      ...crud('api::favorite.favorite', ['find', 'add', 'remove']),
+      ...crud('api::account.account', ['export', 'delete']),
       ...crud('plugin::users-permissions.user', ['me', 'find', 'findOne', 'update', 'destroy']),
     ],
     ensured: [

@@ -14,12 +14,34 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Plugin =>
     deniedTypes: ['image/svg+xml'],
   };
 
+  // E-mails (mot de passe oublié) : envoyés par SMTP si SMTP_HOST est
+  // renseigné. Sinon (dev, tests) nodemailer les construit sans les envoyer.
+  const smtpHost = env('SMTP_HOST');
+  const email = {
+    config: {
+      provider: 'nodemailer',
+      providerOptions: smtpHost
+        ? {
+            host: smtpHost,
+            port: env.int('SMTP_PORT', 587),
+            secure: env.bool('SMTP_SECURE', false),
+            auth: env('SMTP_USER') ? { user: env('SMTP_USER'), pass: env('SMTP_PASSWORD') } : undefined,
+          }
+        : { jsonTransport: true },
+      settings: {
+        defaultFrom: env('EMAIL_FROM', 'Bondiz <no-reply@bondiz.fr>'),
+        defaultReplyTo: env('EMAIL_REPLY_TO', 'bondizmydsu@gmail.com'),
+      },
+    },
+  };
+
   // Without Supabase configuration (local dev, tests), files are stored in public/uploads.
   if (!supabaseUrl) {
-    return { upload: { config: { sizeLimit, security } } };
+    return { email, upload: { config: { sizeLimit, security } } };
   }
 
   return {
+    email,
     upload: {
       config: {
         sizeLimit,

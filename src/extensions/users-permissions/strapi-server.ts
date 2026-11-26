@@ -67,9 +67,10 @@ export default (plugin) => {
     if (!isSelf(ctx)) {
       throw new ForbiddenError('Vous ne pouvez supprimer que votre propre compte.');
     }
-    // A deleted account must not keep receiving notifications. Done first:
-    // once the user is gone, the subscriptions can no longer be found by owner.
-    await strapi.service('api::push-subscription.push-subscription').removeAllForUser(Number(ctx.params.id));
+    // Effacement complet (RGPD) : messages, likes, matchs, notifications,
+    // photos… Fait avant : une fois le compte supprimé, ces données ne
+    // seraient plus retrouvables par leur propriétaire.
+    await strapi.service('api::account.account').deleteUserData(Number(ctx.params.id));
 
     return destroy(ctx);
   };
