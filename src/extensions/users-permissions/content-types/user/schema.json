@@ -82,7 +82,8 @@
       "type": "date"
     },
     "phone": {
-      "type": "biginteger"
+      "type": "string",
+      "maxLength": 20
     },
     "city": {
       "type": "string"

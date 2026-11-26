@@ -1,4 +1,5 @@
 import type { Core } from '@strapi/strapi';
+import cronTasks from './cron-tasks';
 
 const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Server => ({
   host: env('HOST', '0.0.0.0'),
@@ -10,6 +11,8 @@ const config = ({ env }: Core.Config.Shared.ConfigParams): Core.Config.Server =>
   app: {
     keys: env.array('APP_KEYS'),
   },
+  // Désactivé pendant les tests : chaque suite démarre son propre Strapi.
+  cron: { enabled: env('NODE_ENV') !== 'test', tasks: cronTasks },
 });
 
 export default config;
