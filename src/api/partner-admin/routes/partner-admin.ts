@@ -1,7 +1,8 @@
 /**
  * partner-admin router
  *
- * Lets the blog admin list, create and (de)activate partners. Not part of the
+ * Lets the blog admin list, create and (de)activate partners, and answer
+ * their messages. Not part of the
  * public API: every action checks the shared secret (src/utils/blog-auth.ts).
  */
 
@@ -12,5 +13,8 @@ export default {
     { method: 'GET', path: '/partner-admin/partners', handler: 'partner-admin.find', config },
     { method: 'POST', path: '/partner-admin/partners', handler: 'partner-admin.create', config },
     { method: 'PUT', path: '/partner-admin/partners/:id/state', handler: 'partner-admin.setState', config },
+    { method: 'GET', path: '/partner-admin/conversations', handler: 'partner-admin.conversations', config },
+    { method: 'GET', path: '/partner-admin/partners/:id/messages', handler: 'partner-admin.findMessages', config },
+    { method: 'POST', path: '/partner-admin/partners/:id/messages', handler: 'partner-admin.sendMessage', config },
   ],
 };
