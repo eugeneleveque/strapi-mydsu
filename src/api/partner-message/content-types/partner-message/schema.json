@@ -1,0 +1,31 @@
+{
+  "kind": "collectionType",
+  "collectionName": "partner_messages",
+  "info": {
+    "singularName": "partner-message",
+    "pluralName": "partner-messages",
+    "displayName": "Partner message"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "partnerDocumentId": {
+      "type": "string",
+      "required": true
+    },
+    "content": {
+      "type": "text",
+      "required": true
+    },
+    "fromTeam": {
+      "type": "boolean",
+      "default": false,
+      "required": true
+    },
+    "readAt": {
+      "type": "datetime"
+    }
+  }
+}

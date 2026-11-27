@@ -54,6 +54,9 @@
     "website": {
       "type": "string"
     },
+    "openingHours": {
+      "type": "json"
+    },
     "logo": {
       "type": "media",
       "multiple": false,
