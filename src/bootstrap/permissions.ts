@@ -28,6 +28,8 @@ const MANAGED_PREFIXES = [
   'api::profile-view.',
   'api::push-subscription.',
   'plugin::users-permissions.user.',
+  'api::discover.discover.find',
+  'api::discover.discover.pools',
 ];
 
 const crud = (uid: string, actions: string[]) => actions.map((action) => `${uid}.${action}`);
@@ -61,6 +63,7 @@ const PERMISSIONS: Record<string, { managed: string[]; ensured: string[] }> = {
       ...crud('api::message.message', ['find', 'findOne', 'create', 'update', 'delete']),
       ...crud('api::booking.booking', ['find', 'findOne', 'create', 'update', 'delete', 'leave']),
       'api::discover.discover.find',
+      'api::discover.discover.pools',
       ...crud('api::conversation.conversation', ['find', 'findOne', 'messages', 'send', 'read']),
       ...crud('api::push-subscription.push-subscription', ['publicKey', 'subscribe', 'unsubscribe']),
       ...crud('api::profile-view.profile-view', ['find', 'record']),

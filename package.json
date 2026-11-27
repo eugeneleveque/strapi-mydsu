@@ -23,6 +23,7 @@
     "@strapi/provider-email-nodemailer": "^5.54.0",
     "@strapi/strapi": "^5.54.0",
     "bcryptjs": "^2.4.3",
+    "ioredis": "^6.1.0",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.20.0",
     "react": "^18.0.0",
